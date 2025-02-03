@@ -12,19 +12,21 @@
 <body>
 <header>
     <nav>
-        <div class="home">
-            <a href="/">Philately App</a>
-            <a href="/">Add Stamp</a>
+        <div class="home" >
+            <a th:href="@{/}">Philately App</a>
+            <a th:href="@{/stamps}"
+               th:if="${@userSession.isUserLoggedIn()}"
+            >Add Stamp</a>
         </div>
         <div class="links">
             <li>
-                <a href="/">Login</a>
+                <a th:unless="${@userSession.isUserLoggedIn()}" th:href="@{/login}">Login</a>
             </li>
             <li>
-                <a href="/">Register</a>
+                <a th:unless="${@userSession.isUserLoggedIn()}" th:href="@{/register}">Register</a>
             </li>
             <li>
-                <a href="/">Logout</a>
+                <a  th:unless="${@userSession.isUserLoggedIn()}" th:href="@{/logout}">Logout</a>
             </li>
         </div>
     </nav>
