@@ -67,7 +67,7 @@
                                 </div>
                             </div>
                             <div class="second-info">
-                                <p>Added by: <span th:text="${stamp.owner.username}"></span></p>
+                                <p>Added by: <span th:text="${stamp.addedBy.username}"></span></p>
                             </div>
                         </li>
                     </ul>
@@ -83,10 +83,10 @@
                                 <img th:src="${wishlist.imageUrl}" th:alt="${wishlist.name}" width="55px"
                                      height="55" style="padding-top: 0.3em; padding-left: 0.3em">
                                 <!--                                </td>-->
-                                <td style="text-align: end; padding-right: 5px" th:text="|Price: ${s.price} $|"></td>
+                                <td style="text-align: end; padding-right: 5px" th:text="|Price: ${wishlist.price}|"></td>
                                 <td style="width: 15%; padding-top: 8px; padding-right: 5px">
                                     <a class="btn-danger btn"
-                                       th:href="@{/stamps/remove-from-wishlist/{id}(id = *{s.id})}"
+                                       th:href="@{/stamps/remove-from-wishlist/{id}(id = *{wishlist.id})}"
                                     >Remove</a>
                                 </td>
                             </tr>

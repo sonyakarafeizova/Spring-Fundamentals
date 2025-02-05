@@ -1,24 +1,34 @@
 package com.philately.model.dto;
 
+import com.philately.model.entity.PaperType;
+
 public class StampDTO {
     private Long id;
     private String name;
     private String description;
-    private String paperType;
+    private PaperType paper;
     private Integer price;
     private String imageUrl;
-    private String ownerUsername;
 
-    public StampDTO(Long id, String name, String description, String paperType, Integer price, String imageUrl, String ownerUsername) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.paperType = paperType;
-        this.price = price;
-        this.imageUrl = imageUrl;
-        this.ownerUsername = ownerUsername;
+    private Long addedBy;
+
+    private boolean wished;
+
+    public Long getAddedBy() {
+        return addedBy;
     }
 
+    public void setAddedBy(Long addedBy) {
+        this.addedBy = addedBy;
+    }
+
+    public boolean isWished() {
+        return wished;
+    }
+
+    public void setWished(boolean wished) {
+        this.wished = wished;
+    }
 
     public Long getId() {
         return id;
@@ -44,12 +54,12 @@ public class StampDTO {
         this.description = description;
     }
 
-    public String getPaperType() {
-        return paperType;
+    public PaperType getPaper() {
+        return paper;
     }
 
-    public void setPaperType(String paperType) {
-        this.paperType = paperType;
+    public void setPaper(PaperType paper) {
+        this.paper = paper;
     }
 
     public Integer getPrice() {
@@ -68,11 +78,5 @@ public class StampDTO {
         this.imageUrl = imageUrl;
     }
 
-    public String getOwnerUsername() {
-        return ownerUsername;
-    }
 
-    public void setOwnerUsername(String ownerUsername) {
-        this.ownerUsername = ownerUsername;
-    }
 }

@@ -2,15 +2,14 @@ package com.philately.controller;
 
 import com.philately.model.dto.UserLoginDTO;
 import com.philately.model.dto.UserRegisterDTO;
-import com.philately.model.dto.UserResponseDTO;
 import com.philately.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-@RestController
+@Controller
 @RequestMapping("/users")
 public class UserController {
 
@@ -30,63 +29,77 @@ public class UserController {
         return new UserLoginDTO();
     }
 
+
     @GetMapping("/register")
-    public String viewRegister() {
+    public String register() {
         return "register";
     }
 
-    @PostMapping("/register")
-    public String doRegister(
-            @Valid UserRegisterDTO data,
-            BindingResult bindingResult,
-            RedirectAttributes redirectAttributes
-    ) {
-        if (bindingResult.hasErrors() || !userService.register(data)) {
-            redirectAttributes.addFlashAttribute("registerData", data);
-            redirectAttributes.addFlashAttribute(
-                    "org.springframework.validation.BindingResult.registerData", bindingResult);
 
-            return "redirect:/register";
+    @PostMapping("/register")
+    public String registerConfirm(
+            @Valid @ModelAttribute("registerData") UserRegisterDTO registerDTO,
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors() || !userService.register(registerDTO)) {
+            redirectAttributes.addFlashAttribute("registerData", registerDTO);
+            redirectAttributes.addFlashAttribute(
+                    "org.springframework.validation.BindingResult.registerData", result);
+            return "redirect:/users/register";
         }
 
-        return "redirect:/login";
+        return "redirect:/users/login";
     }
 
+
     @GetMapping("/login")
-    public String viewLogin() {
+    public String login(Model model) {
         return "login";
     }
 
-//    @PostMapping("/login")
-//    public String doLogin(
-//            @Valid UserLoginDTO data,
-//            BindingResult bindingResult,
-//            RedirectAttributes redirectAttributes
-//    ) {
-//        if (bindingResult.hasErrors()) {
-//            redirectAttributes.addFlashAttribute("loginData", data);
-//            redirectAttributes.addFlashAttribute(
-//                    "org.springframework.validation.BindingResult.loginData", bindingResult);
-//
-//            return "redirect:/login";
-//        }
-//
-//        UserResponseDTO success = userService.loginUser(data);
-//
-//        if (success != null) {
-//            return "redirect:/home";
-//        }
-//        redirectAttributes.addFlashAttribute("loginData", data);
-//        redirectAttributes.addFlashAttribute("userPassMismatch", true);
-//
-//        return "redirect:login";
-//
-//    }
+    // Handle login request
+    @PostMapping("/login")
+    public String loginConfirm(
+            @Valid @ModelAttribute("loginData") UserLoginDTO loginDTO,
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
 
-    @PostMapping("/logout")
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("loginData", loginDTO);
+            redirectAttributes.addFlashAttribute(
+                    "org.springframework.validation.BindingResult.loginData", result);
+            return "redirect:/users/login";
+        }
+
+        if (userService.loginUser(loginDTO) == null) {
+            redirectAttributes.addFlashAttribute("loginData", loginDTO);
+            redirectAttributes.addFlashAttribute("userPassMismatch", true);
+            return "redirect:/users/login";
+        }
+
+        return "redirect:/home";
+    }
+
+
+    @GetMapping("/logout")
     public String logout() {
         userService.logout();
-
         return "redirect:/";
+    }
+
+    @ModelAttribute
+    public UserLoginDTO loginDTO() {
+        return new UserLoginDTO();
+    }
+
+    @ModelAttribute
+    public UserRegisterDTO registerDTO() {
+        return new UserRegisterDTO();
+    }
+
+    @ModelAttribute
+    public void addAttribute(Model model) {
+        model.addAttribute("validCredentials");
     }
 }

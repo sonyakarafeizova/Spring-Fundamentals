@@ -45,6 +45,7 @@ private final LoggedUser loggedUser;
         model.addAttribute("currentUserInfo", user);
 
         assert user != null;
+
         List<Stamp> allStampsByUser = this.stampService.getAllStampsByUser((user.getId()));
         List<Stamp> allStamps = this.stampService.getAllStamps(user);
         Set<Stamp> userWishedStamps = this.stampService.getWishedStampsByUser(user.getId());
@@ -57,7 +58,5 @@ private final LoggedUser loggedUser;
 
         return "home";
     }
-
-
 
 }

@@ -6,14 +6,14 @@
 <header th:replace="~{fragments/commons::nav}"></header>
 <main>
     <form class="welcome login"
-          th:action="@{/login}"
+          th:action="@{/users/login}"
           th:method="POST"
           th:object="${loginData}">
 
         <!--    Example: Render errors messages with fields.errors - you can make it differently. -->
         <!--    <div th:each="error: ${#fields.errors()}" th:text="${error}" class="text-danger">Error messages</div>-->
-        <div th:if="${userPassMismatch}" class="bg-danger text-light rounded">Error messages</div>
-        <div th:if="${userPassMismatch}" class="bg-danger text-light rounded">Incorrect username or password!</div>
+        <div th:each="error: ${#fields.errors()}" th:text="${error} class="bg-danger text-light rounded">Error messages</div>
+        <div  th:if="${validCredentials == false}" class="bg-danger text-light rounded">Incorrect username or password!</div>
         <div class="form-group">
             <h1 class="text-center mt-2"><span class="badge badge-pill badge-dark">Login</span></h1>
             <div class="label-holder text-white d-flex justify-content-center">

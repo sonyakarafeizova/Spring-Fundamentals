@@ -3,6 +3,8 @@ package com.philately.repository;
 import com.philately.model.entity.Stamp;
 import com.philately.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -13,7 +15,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
 
-    Set<Stamp> getWishedStamps(Long id);
+    @Query("select s.wishedStamps from User as s where s.id= :id")
+    Set<Stamp> getWishedStamps(@Param("id") Long id);
 
-    Set<Stamp> getBoughtStamps(Long id);
+    @Query("select s.purchasedStamps from User as s where s.id= :id")
+    Set<Stamp> getBoughtStamps(@Param("id") Long id);
+
+
 }

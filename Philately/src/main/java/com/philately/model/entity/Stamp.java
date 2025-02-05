@@ -2,6 +2,8 @@ package com.philately.model.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Optional;
+
 @Entity
 @Table(name = "stamps")
 public class Stamp extends BaseEntity {
@@ -11,19 +13,29 @@ public class Stamp extends BaseEntity {
     @Column(nullable = false, length = 25)
     private String description;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name = "paper_id", nullable = false)
     private Paper paper;
 
     @Column(nullable = false)
     private int price;
 
-    @Column(nullable = false, length = 150)
+    @Column
     private String imageUrl;
 
     @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User addedBy;
+    @Column
+    private boolean wished;
+
+    public boolean isWished() {
+        return wished;
+    }
+
+    public void setWished(boolean wished) {
+        this.wished = wished;
+    }
 
     public String getName() {
         return name;
@@ -65,11 +77,11 @@ public class Stamp extends BaseEntity {
         this.imageUrl = imageUrl;
     }
 
-    public User getOwner() {
-        return owner;
+    public User getAddedBy() {
+        return addedBy;
     }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setAddedBy(User addedBy) {
+        this.addedBy = addedBy;
     }
 }

@@ -1,21 +1,33 @@
 package com.philately.model.dto;
 
+import com.philately.validation.annotation.UniqueEmail;
+import com.philately.validation.annotation.UniqueUsername;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class UserRegisterDTO {
-    @NotBlank
-    @Size(min = 3, max = 20)
+    private Long id;
+
+    @UniqueUsername
+    @Size(min = 3, max = 20, message = "Username length must be between 3 and 20 characters!")
+    @NotNull
     private String username;
 
-    @NotBlank
-    @Size(min = 3, max = 20)
+    @UniqueEmail
+    @Email(message = "Enter valid email!")
+    @NotBlank(message = "Email cannot be empty!")
+    private String email;
+
+    @Size(min = 3, max = 20, message = "Password length must be between 3 and 20 characters!")
+    @NotNull
     private String password;
 
-    @NotBlank
-    @Email
-    private String email;
+    @Size(min = 3, max = 20, message = "Password length must be between 3 and 20 characters!")
+    @NotNull
+    private String confirmPassword;
+
 
     public UserRegisterDTO() {}
 
@@ -23,6 +35,14 @@ public class UserRegisterDTO {
         this.username = username;
         this.password = password;
         this.email = email;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -33,6 +53,14 @@ public class UserRegisterDTO {
         this.username = username;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -41,11 +69,11 @@ public class UserRegisterDTO {
         this.password = password;
     }
 
-    public String getEmail() {
-        return email;
+    public String getConfirmPassword() {
+        return confirmPassword;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
 }

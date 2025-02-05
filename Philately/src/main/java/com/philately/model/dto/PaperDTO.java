@@ -1,23 +1,23 @@
 package com.philately.model.dto;
 
+import com.philately.model.entity.Stamp;
+
+import java.util.HashSet;
+import java.util.Set;
+
 public class PaperDTO {
-    private Long id;
     private String paperName;
     private String description;
+    private Set<Stamp> stamps;
 
-    public PaperDTO(Long id, String paperName, String description) {
-        this.id = id;
+    public PaperDTO( String paperName, String description, Set<Stamp> stamps) {
+
         this.paperName = paperName;
         this.description = description;
+        this.stamps = new HashSet<>();
     }
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getPaperName() {
         return paperName;
@@ -33,5 +33,13 @@ public class PaperDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Set<Stamp> getStamps() {
+        return stamps;
+    }
+
+    public void setStamps(Set<Stamp> stamps) {
+        this.stamps = stamps;
     }
 }

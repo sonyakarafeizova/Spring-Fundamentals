@@ -2,16 +2,19 @@ package com.philately.model.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "papers")
 public class Paper extends BaseEntity{
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, unique = true)
     private PaperType paperName;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String description;
+    @OneToMany(mappedBy = "paper")
+    private Set<Stamp> stamps;
 
     public PaperType getPaperName() {
         return paperName;
@@ -29,4 +32,11 @@ public class Paper extends BaseEntity{
         this.description = description;
     }
 
+    public Set<Stamp> getStamps() {
+        return stamps;
+    }
+
+    public void setStamps(Set<Stamp> stamps) {
+        this.stamps = stamps;
+    }
 }

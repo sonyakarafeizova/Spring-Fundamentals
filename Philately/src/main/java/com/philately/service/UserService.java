@@ -1,18 +1,21 @@
 package com.philately.service;
 
+import com.google.gson.Gson;
 import com.philately.controller.UserSession;
-import com.philately.model.dto.UserLoginDTO;
 import com.philately.model.dto.UserRegisterDTO;
-import com.philately.model.dto.UserResponseDTO;
+import com.philately.model.dto.UserDTO;
 import com.philately.model.entity.User;
 import com.philately.repository.UserRepository;
 import com.philately.util.LoggedUser;
-import com.philately.validation.ValidationUtil;
+import jakarta.servlet.http.HttpSession;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Service
@@ -22,79 +25,102 @@ public class UserService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final LoggedUser loggedUser;
+    private final Gson gson;
+    private final HttpSession session;
+    private static final String USERS_FILE_PATH = "src/main/resources/static/files/users.json";
 
-    public UserService(UserRepository userRepository, UserSession userSession, ModelMapper modelMapper, PasswordEncoder passwordEncoder, LoggedUser loggedUser) {
+
+    public UserService(UserRepository userRepository, UserSession userSession, ModelMapper modelMapper, PasswordEncoder passwordEncoder, LoggedUser loggedUser, Gson gson, HttpSession session) {
         this.userRepository = userRepository;
         this.userSession = userSession;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
         this.loggedUser = loggedUser;
+        this.gson = gson;
+        this.session = session;
+    }
+    public String readUsersFileContent() throws IOException {
+        return Files.readString(Path.of(USERS_FILE_PATH));
     }
 
-    public UserResponseDTO registerUser(UserRegisterDTO userDTO) {
-        if (!ValidationUtil.isValidUsername(userDTO.getUsername())) {
-            throw new IllegalArgumentException("Invalid username. Must be between 3 and 20 characters.");
+    public UserDTO findUserByUsername(String username) {
+        User user = this.getUserByUsername(username);
+        if (user == null) {
+            return null;
         }
-        if (!ValidationUtil.isValidPassword(userDTO.getPassword())) {
-            throw new IllegalArgumentException("Invalid password. Must be between 3 and 20 characters.");
-        }
-        if (!ValidationUtil.isValidEmail(userDTO.getEmail())) {
-            throw new IllegalArgumentException("Invalid email format.");
-        }
-        if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists!");
-        }
-        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email already exists!");
+        return this.mapUserDTO(user);
+    }
+    public UserDTO findUserByEmail(String email) {
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return null;
         }
 
-        User user = new User();
-        user.setUsername(userDTO.getUsername());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setEmail(userDTO.getEmail());
-
-        userRepository.save(user);
-
-        return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail(), new ArrayList<>());
+        return this.mapUserDTO(user);
     }
 
-//    public UserResponseDTO loginUser(UserLoginDTO loginDTO) {
-//        User user = userRepository.findByUsername(loginDTO.getUsername())
-//                .orElseThrow(() -> new IllegalArgumentException("User not found!"));
-//
-//        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-//            throw new IllegalArgumentException("Invalid password!");
-//        }
-//
-//        return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail(), new ArrayList<>());
-//    }
+    public boolean checkCredentials(String username, String password) {
+        User user = this.getUserByUsername(username);
 
-    public void logout() {
-        userSession.logout();
+        if (user == null) {
+            return false;
+        }
+
+        return passwordEncoder.matches(password, user.getPassword());
     }
 
-    public Optional<User> findUserById(Long id) {
-        return userRepository.findById(id);
-
-    }
-
-    public boolean register(UserRegisterDTO data) {
-        this.userRepository.save(this.modelMapper.map(data, User.class));
-        this.login(data.getUsername());
-        return false;
-    }
-
-    private void login(String username) {
+    public void login(String username) {
         User user = this.getUserByUsername(username);
         this.loggedUser.setId(user.getId());
         this.loggedUser.setUsername(user.getUsername());
+    }
+
+    public void register(UserRegisterDTO registerDTO) {
+        this.userRepository.save(this.mapUser(registerDTO));
+        this.login(registerDTO.getUsername());
+    }
+
+    public void logout() {
+        this.session.invalidate();
+        this.loggedUser.setId(null);
+        this.loggedUser.setUsername(null);
+    }
+
+    private User getUSerById(Long userId) {
+        return this.userRepository.findById(userId).orElseThrow();
     }
 
     private User getUserByUsername(String username) {
         return this.userRepository.findByUsername(username).orElse(null);
     }
 
+    private User mapUser(UserRegisterDTO registerDTO) {
+        User user = new User();
+        user.setUsername(registerDTO.getUsername());
+        user.setEmail(registerDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
+        return user;
+    }
 
+    private UserDTO mapUserDTO(User user) {
+        return new UserDTO()
+                .setId(user.getId())
+                .setEmail(user.getEmail())
+                .setUsername(user.getUsername());
+    }
+
+    public void initUsers() throws IOException {
+        Arrays.stream(gson.fromJson(readUsersFileContent(), UserDTO[].class))
+                .map(userDTO -> {
+                    User user = modelMapper.map(userDTO, User.class);
+                    user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+                    return user;
+                }).forEach(userRepository::save);
+    }
+
+
+    public Optional<User> findUserById(Long id) {
+        return userRepository.findById(id);
+
+    }
 }
-
-

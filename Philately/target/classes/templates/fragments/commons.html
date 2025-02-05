@@ -19,14 +19,15 @@
             >Add Stamp</a>
         </div>
         <div class="links">
-            <li>
-                <a th:unless="${@userSession.isUserLoggedIn()}" th:href="@{/login}">Login</a>
+            <li th:if="${!@loggedUser.isLogged()}">
+                <a href="/users/login">Login</a>
             </li>
-            <li>
-                <a th:unless="${@userSession.isUserLoggedIn()}" th:href="@{/register}">Register</a>
+            <li th:if="${!@loggedUser.isLogged()}">
+                <a href="/users/register">Register</a>
             </li>
-            <li>
-                <a  th:unless="${@userSession.isUserLoggedIn()}" th:href="@{/logout}">Logout</a>
+
+            <li th:if="${@loggedUser.isLogged()}">
+                <a href="/users/logout">Logout</a>
             </li>
         </div>
     </nav>

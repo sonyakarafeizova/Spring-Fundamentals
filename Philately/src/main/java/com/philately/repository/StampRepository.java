@@ -9,9 +9,6 @@ import java.util.List;
 
 @Repository
 public interface StampRepository extends JpaRepository<Stamp,Long> {
-    List<Stamp> findAllByOwnerIsNull();
-    List<Stamp> findByOwner_Id(Long userId);
-
     List<Stamp> findByAddedById(Long id);
 
     List<Stamp> findStampsByAddedByNot(User addedBy);

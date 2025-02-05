@@ -2,7 +2,6 @@ package com.philately.model.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,17 +17,18 @@ public class User extends BaseEntity {
     @Column(name = "email", nullable = false, unique = true)
     @Email
     private String email;
-    @ManyToMany
-    @JoinTable(
-            name = "wishlist",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "stamp_id")
-    )
-    private Set<Stamp> wishList = new HashSet<>();
+    @OneToMany(fetch = FetchType.EAGER)
+    private Set<Stamp> addedStamps = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn(name = "buyer_id")
-    private Set<Stamp> purchasedStamps = new HashSet<>();
+    @OneToMany(fetch = FetchType.EAGER)
+    private Set<Stamp> wishedStamps;
+
+    @OneToMany(fetch = FetchType.EAGER)
+
+    private Set<Stamp> purchasedStamps;
+
+    public User() {
+    }
 
     public String getUsername() {
         return username;
@@ -54,12 +54,20 @@ public class User extends BaseEntity {
         this.email = email;
     }
 
-    public Set<Stamp> getWishList() {
-        return wishList;
+    public Set<Stamp> getAddedStamps() {
+        return addedStamps;
     }
 
-    public void setWishList(Set<Stamp> wishList) {
-        this.wishList = wishList;
+    public void setAddedStamps(Set<Stamp> addedStamps) {
+        this.addedStamps = addedStamps;
+    }
+
+    public Set<Stamp> getWishedStamps() {
+        return wishedStamps;
+    }
+
+    public void setWishedStamps(Set<Stamp> wishedStamps) {
+        this.wishedStamps = wishedStamps;
     }
 
     public Set<Stamp> getPurchasedStamps() {
